@@ -1,354 +1,490 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { ExternalLink, Github } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { motion, useAnimation } from "framer-motion";
+import { useInView } from "framer-motion";
+import { useRef } from "react";
+import { ExternalLink, Github, Filter, Code, Brain, Eye, MessageSquare, Database, Globe, Heart, DollarSign, BarChart3, Smartphone, Zap } from "lucide-react";
 
-const projects = [
+interface Project {
+  id: number;
+  title: string;
+  description: string;
+  demoUrl?: string;
+  githubUrl?: string;
+  tags: string[];
+  category: string;
+  isInDevelopment?: boolean;
+}
+
+interface ProjectCategory {
+  id: string;
+  name: string;
+  icon: React.ElementType;
+  color: string;
+}
+
+const projects: Project[] = [
   {
-    title: "Game System Compatibility Checker",
-    subtitle: "GSCC",
-    description: "Tool for gamers to check if their system can handle the latest games. Enter your specs to analyze compatibility and avoid buying games your PC can't run.",
-    demoLink: "https://iridescent-rolypoly-782dae.netlify.app/",
-    tags: ["Gaming", "System Analysis", "Compatibility"],
-    image: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/a6662235-904c-49f9-9077-9ec36bf710c8-designcube-framer-ai/assets/images/VSgmTjB3esAIEBsN8zmH3e0KUEo-15.png?"
+    id: 1,
+    title: "Game System Compatibility Checker (GSCC)",
+    description: "Advanced AI-powered tool that analyzes game requirements and system specifications to provide compatibility recommendations and performance predictions.",
+    demoUrl: "https://iridescent-rolypoly-782dae.netlify.app/",
+    tags: ["AI/ML", "Gaming", "Compatibility"],
+    category: "AI/ML"
   },
   {
-    title: "Attendance & Performance Tracker",
-    subtitle: "Workforce Management", 
-    description: "Comprehensive app for workforce management—track attendance, manage salaries/payroll, PF contributions, and monitor performance metrics in real time.",
-    demoLink: "https://wmsms.vercel.app/",
-    tags: ["HR Management", "Analytics", "Real-time"],
-    image: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/a6662235-904c-49f9-9077-9ec36bf710c8-designcube-framer-ai/assets/images/EvCKA7o2VdatFHO6aOdjbIXWTEU-16.png?"
+    id: 2,
+    title: "Attendance, Salary, PF & Performance Tracker",
+    description: "Comprehensive workforce management system with AI-driven analytics for attendance tracking, salary processing, and performance evaluation.",
+    demoUrl: "https://wmsms.vercel.app/",
+    tags: ["Data Analytics", "HR Management", "Dashboard"],
+    category: "Data Analytics"
   },
   {
+    id: 3,
     title: "Moody News",
-    subtitle: "Personalized News",
-    description: "Get headlines and news stories tailored to your current mood for a personalized and engaging information experience.",
-    demoLink: "https://moody-news.vercel.app/",
-    tags: ["News", "AI", "Personalization"],
-    image: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/a6662235-904c-49f9-9077-9ec36bf710c8-designcube-framer-ai/assets/images/TeLjhJiSPxgMNWneUa2e2Zo-17.png?"
+    description: "AI-powered news platform that analyzes sentiment and mood of news articles to provide emotional context and personalized content curation.",
+    demoUrl: "https://moody-news.vercel.app/",
+    tags: ["NLP", "Sentiment Analysis", "News"],
+    category: "NLP"
   },
   {
-    title: "Named Entity Linking",
-    subtitle: "NEL System",
-    description: "AI system that links entities (people, places, organizations) in text to database entries, enabling smarter search and data insights.",
-    demoLink: "https://nel-by-ms.netlify.app/",
-    tags: ["NLP", "AI", "Data Linking"],
-    image: "https://framerusercontent.com/images/Wz3hFd8Q00IPgx6kaYPHaCCHOmo.png"
+    id: 4,
+    title: "Named Entity Linking (NEL)",
+    description: "Advanced NLP system for identifying and linking named entities in text to knowledge bases using state-of-the-art machine learning algorithms.",
+    demoUrl: "https://nel-by-ms.netlify.app/",
+    tags: ["NLP", "Entity Recognition", "Knowledge Graph"],
+    category: "NLP"
   },
   {
+    id: 5,
     title: "QuantumShield Firewall",
-    subtitle: "Network Security",
-    description: "Advanced network firewall providing robust protection, real-time threat detection, seamless integration, and user-friendly security for digital assets.",
-    demoLink: "https://fire-wall.netlify.app/",
-    tags: ["Security", "Firewall", "Real-time"],
-    image: "https://framerusercontent.com/images/uxNbVYg6JF1nOlix86r82F8kT0.png"
+    description: "Next-generation AI-driven cybersecurity solution with quantum-resistant encryption and intelligent threat detection capabilities.",
+    demoUrl: "https://fire-wall.netlify.app/",
+    tags: ["Cybersecurity", "AI/ML", "Network Security"],
+    category: "AI/ML"
   },
   {
+    id: 6,
     title: "All Rounder API Key Generator",
-    subtitle: "Developer Tools",
-    description: "Quickly generates secure API keys for developers, ensuring ease of setup and improved project security.",
-    demoLink: "https://allrounder-api.netlify.app/",
-    tags: ["API", "Security", "Developer Tools"],
-    image: "https://framerusercontent.com/images/BvzncGBbb6FIgtrlaloObIiG2cY.png"
+    description: "Intelligent API key management system with automated generation, rotation, and security monitoring using machine learning algorithms.",
+    demoUrl: "https://allrounder-api.netlify.app/",
+    tags: ["Web Development", "Security", "API Management"],
+    category: "Web Development"
   },
   {
+    id: 7,
     title: "Traffic Management Wizard",
-    subtitle: "Smart City",
-    description: "Smart city traffic management with real-time analytics using signals, cameras, and data to reduce congestion and improve transportation.",
-    demoLink: "https://gregarious-buttercream-270467.netlify.app/",
-    tags: ["IoT", "Traffic", "Smart City"],
-    image: "https://framerusercontent.com/images/HowmrQKMjv4J2RQAp5h9XISrO0E.jpg"
+    description: "Smart city traffic optimization system using IoT sensors and AI algorithms to reduce congestion and improve urban mobility.",
+    demoUrl: "https://gregarious-buttercream-270467.netlify.app/",
+    tags: ["IoT", "Smart City", "Traffic Optimization"],
+    category: "IoT"
   },
   {
+    id: 8,
     title: "Text Analyzer Pro",
-    subtitle: "Writing Assistant",
-    description: "Text improvement tool offering feedback on readability, grammar, and style; valuable for students, professionals, and writers.",
-    demoLink: "https://analyzetex.netlify.app/",
-    tags: ["NLP", "Writing", "Analysis"],
-    image: "https://framerusercontent.com/images/OWRKyo7wdaCEBYCGswlPbEYfsDE.jpg"
+    description: "Comprehensive text analysis platform with sentiment analysis, readability scoring, keyword extraction, and linguistic pattern recognition.",
+    demoUrl: "https://analyzetex.netlify.app/",
+    tags: ["NLP", "Text Analysis", "Linguistics"],
+    category: "NLP"
   },
   {
+    id: 9,
     title: "CardioDetect",
-    subtitle: "Health AI",
-    description: "AI-driven early cancer detection via heartbeat analysis. Uses pattern recognition algorithms to identify health risks and improve diagnostics.",
-    demoLink: "https://dlqmwdpj.manus.space/",
-    tags: ["Healthcare", "AI", "Diagnostics"],
-    image: "https://framerusercontent.com/images/bHoMJycEVIqbQuBZGPglGrRGd0.png"
+    description: "Advanced deep learning system for cardiovascular disease detection using medical imaging and patient data analysis.",
+    demoUrl: "https://dlqmwdpj.manus.space/",
+    tags: ["Healthcare", "Deep Learning", "Medical Imaging"],
+    category: "Healthcare"
   },
   {
+    id: 10,
     title: "Face Mask Detection with Deep Learning",
-    subtitle: "Computer Vision",
-    description: "Computer vision system using MobileNetV2 to detect face masks in images and video. High accuracy in classifying 'With Mask' and 'Without Mask'.",
-    demoLink: null,
-    tags: ["Deep Learning", "Computer Vision", "MobileNetV2"],
-    image: "https://framerusercontent.com/images/yX9Gl8pNA4l5Vs5YOVxoGyoFYWU.png"
+    description: "Real-time computer vision system for detecting face mask compliance using convolutional neural networks and edge computing.",
+    isInDevelopment: true,
+    tags: ["Computer Vision", "Deep Learning", "Safety"],
+    category: "Computer Vision"
   },
   {
+    id: 11,
     title: "Customer Churn Prediction",
-    subtitle: "ML Pipeline",
-    description: "ML pipeline for predicting customer churn in telecom. Used ensemble models (Random Forest, XGBoost), 85%+ accuracy, actionable business insights.",
-    demoLink: null,
-    tags: ["Machine Learning", "XGBoost", "Business Analytics"],
-    image: "https://framerusercontent.com/images/bJwEJr6t7QDk4iUVUFjAxTz5TLs.png"
+    description: "Machine learning model that predicts customer churn probability using behavioral analytics and predictive modeling techniques.",
+    isInDevelopment: true,
+    tags: ["Machine Learning", "Predictive Analytics", "Business Intelligence"],
+    category: "Data Analytics"
   },
   {
+    id: 12,
     title: "Music Genre Classification",
-    subtitle: "Audio AI",
-    description: "Audio classification model (CNNs, LSTMs) to identify music genres from raw audio. Extracted MFCCs, deployed as a web app.",
-    demoLink: "#",
-    tags: ["CNN", "LSTM", "Audio Processing"],
-    image: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/a6662235-904c-49f9-9077-9ec36bf710c8-designcube-framer-ai/assets/images/j81hNjMX2g5xuwiXlJUK8leOn8-24.png?"
+    description: "AI-powered audio analysis system that automatically classifies music genres using deep neural networks and audio feature extraction.",
+    demoUrl: "#",
+    tags: ["Audio Processing", "Classification", "Entertainment"],
+    category: "AI/ML"
   },
   {
+    id: 13,
     title: "E-Commerce Product Recommendation System",
-    subtitle: "Hybrid Recommender",
-    description: "Hybrid recommendation engine (collaborative + content-based) suggesting products based on user history and features. Improved engagement by 20% in A/B testing.",
-    demoLink: "#",
-    tags: ["Recommendation", "Collaborative", "E-commerce"],
-    image: "https://framerusercontent.com/images/96Z6IpQA2x5XwidjMZuMofmk.png"
+    description: "Personalized recommendation engine using collaborative filtering and content-based algorithms to enhance shopping experiences.",
+    demoUrl: "#",
+    tags: ["Recommendation System", "E-Commerce", "Personalization"],
+    category: "AI/ML"
   },
   {
+    id: 14,
     title: "Sentiment Analysis on Social Media",
-    subtitle: "BERT Classification",
-    description: "Real-time sentiment analysis pipeline using BERT for tweet classification (positive, negative, neutral). Trend visualization for marketing insights.",
-    demoLink: "#",
-    tags: ["BERT", "NLP", "Social Media"],
-    image: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/a6662235-904c-49f9-9077-9ec36bf710c8-designcube-framer-ai/assets/images/eXmDMzjaPw3mPB3gWgVxlv0WjQ.png"
+    description: "Large-scale social media sentiment analysis platform for brand monitoring and public opinion tracking across multiple platforms.",
+    demoUrl: "#",
+    tags: ["Social Media", "Sentiment Analysis", "Brand Monitoring"],
+    category: "NLP"
   },
   {
+    id: 15,
     title: "Spam Mail Analyzer",
-    subtitle: "Security Tool",
-    description: "Tool for filtering spam emails by analyzing sender, subject, and content. Helps maintain a cleaner inbox, reduces phishing/malware.",
-    demoLink: "#",
-    tags: ["Security", "Email", "Classification"],
-    image: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/a6662235-904c-49f9-9077-9ec36bf710c8-designcube-framer-ai/assets/images/4GRQXILMZys5PdVn4VHjCVkJ17w.png"
+    description: "Intelligent email filtering system using natural language processing and machine learning to detect and categorize spam messages.",
+    demoUrl: "#",
+    tags: ["Email Security", "Classification", "Cybersecurity"],
+    category: "AI/ML"
   },
   {
+    id: 16,
     title: "SmartCity IoT",
-    subtitle: "Urban Analytics",
-    description: "IoT integration in urban environments (traffic, waste, transport) for smarter resource management and real-time analytics. PC-optimized.",
-    demoLink: "#",
-    tags: ["IoT", "Smart City", "Analytics"],
-    image: "https://framerusercontent.com/images/Wz3hFd8Q00IPgx6kaYPHaCCHOmo.png"
+    description: "Comprehensive IoT platform for smart city management including environmental monitoring, energy optimization, and citizen services.",
+    demoUrl: "#",
+    tags: ["IoT", "Smart City", "Environmental Monitoring"],
+    category: "IoT"
   },
   {
-    title: "Life Goal Unleashed",
-    subtitle: "Life Pattern Analyzer",
-    description: "Analyzes user habits/routines, providing tailored personal growth insights and productivity improvements.",
-    demoLink: "#",
-    tags: ["Analytics", "Personal Growth", "Productivity"],
-    image: "https://framerusercontent.com/images/uxNbVYg6JF1nOlix86r82F8kT0.png"
+    id: 17,
+    title: "Life Goal Unleashed (Life Pattern Analyzer)",
+    description: "AI-driven personal development platform that analyzes life patterns and provides personalized goal-setting and achievement strategies.",
+    demoUrl: "#",
+    tags: ["Personal Development", "Pattern Analysis", "Goal Setting"],
+    category: "AI/ML"
   },
   {
+    id: 18,
     title: "SocialStarX",
-    subtitle: "Social Automation",
-    description: "Social media automation tool for scheduling posts, managing accounts, analytics, and growing online presence.",
-    demoLink: "#",
-    tags: ["Automation", "Social Media", "Analytics"],
-    image: "https://framerusercontent.com/images/BvzncGBbb6FIgtrlaloObIiG2cY.png"
+    description: "Social media analytics and influence measurement platform using graph algorithms and engagement pattern analysis.",
+    demoUrl: "#",
+    tags: ["Social Analytics", "Influence Measurement", "Network Analysis"],
+    category: "Data Analytics"
   },
   {
+    id: 19,
     title: "ReactNative",
-    subtitle: "Mobile Framework",
-    description: "Mobile app framework to build cross-platform apps using JavaScript and React, featuring hot-reloading and native-like performance.",
-    demoLink: "#",
-    tags: ["React Native", "Mobile", "Cross-platform"],
-    image: "https://framerusercontent.com/images/HowmrQKMjv4J2RQAp5h9XISrO0E.jpg"
+    description: "Cross-platform mobile application development framework with integrated AI components and real-time data synchronization.",
+    demoUrl: "#",
+    tags: ["Mobile Development", "Cross-Platform", "Real-Time"],
+    category: "Mobile Development"
   },
   {
+    id: 20,
     title: "X Analytics",
-    subtitle: "Market Intelligence",
-    description: "Market analysis tool for business insights into trends and consumer behavior; advanced analytics, visualizations, decision-making support.",
-    demoLink: "#",
-    tags: ["Analytics", "Market Research", "Business Intelligence"],
-    image: "https://framerusercontent.com/images/OWRKyo7wdaCEBYCGswlPbEYfsDE.jpg"
+    description: "Advanced social media analytics platform with sentiment tracking, trend analysis, and competitive intelligence features.",
+    demoUrl: "#",
+    tags: ["Social Analytics", "Trend Analysis", "Competitive Intelligence"],
+    category: "Data Analytics"
   },
   {
+    id: 21,
     title: "CredWise",
-    subtitle: "Credit Predictor",
-    description: "AI-powered credit card approval predictor with personalized recommendations, helping users understand eligibility and navigate credit.",
-    demoLink: "#",
-    tags: ["AI", "Credit Scoring", "Finance"],
-    image: "https://framerusercontent.com/images/bHoMJycEVIqbQuBZGPglGrRGd0.png"
+    description: "AI-powered credit scoring and financial risk assessment platform using alternative data sources and machine learning algorithms.",
+    demoUrl: "#",
+    tags: ["Fintech", "Credit Scoring", "Risk Assessment"],
+    category: "Finance"
   },
   {
+    id: 22,
     title: "FintechAnalytics",
-    subtitle: "Data Exploration",
-    description: "Exploratory data analysis tool for summarizing and visualizing datasets, uncovering patterns and insights for analysts.",
-    demoLink: "#",
-    tags: ["Data Science", "Fintech", "Visualization"],
-    image: "https://framerusercontent.com/images/yX9Gl8pNA4l5Vs5YOVxoGyoFYWU.png"
+    description: "Comprehensive financial analytics platform with fraud detection, algorithmic trading, and portfolio optimization capabilities.",
+    demoUrl: "#",
+    tags: ["Financial Analytics", "Fraud Detection", "Trading"],
+    category: "Finance"
   },
   {
+    id: 23,
     title: "SalesAnalytics",
-    subtitle: "Sales Dashboard",
-    description: "Dashboard for collecting, analyzing, and interpreting sales data to optimize sales strategies and drive growth.",
-    demoLink: "#",
-    tags: ["Sales", "Dashboard", "Analytics"],
-    image: "https://framerusercontent.com/images/bJwEJr6t7QDk4iUVUFjAxTz5TLs.png"
+    description: "Advanced sales performance analytics with predictive modeling, lead scoring, and revenue forecasting using machine learning.",
+    demoUrl: "#",
+    tags: ["Sales Analytics", "Predictive Modeling", "CRM"],
+    category: "Data Analytics"
   },
   {
+    id: 24,
     title: "msGPT",
-    subtitle: "AI Assistant",
-    description: "Advanced AI assistant for content generation, answering questions, and providing reliable, quick support using language models.",
-    demoLink: "#",
-    tags: ["AI", "GPT", "Assistant"],
-    image: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/a6662235-904c-49f9-9077-9ec36bf710c8-designcube-framer-ai/assets/images/j81hNjMX2g5xuwiXlJUK8leOn8-24.png?"
+    description: "Custom large language model fine-tuned for specialized domains with advanced reasoning capabilities and multimodal understanding.",
+    demoUrl: "#",
+    tags: ["Large Language Model", "GPT", "Conversational AI"],
+    category: "AI/ML"
   }
 ];
 
-export default function ProjectsSection() {
-  const [visibleItems, setVisibleItems] = useState<boolean[]>(new Array(projects.length).fill(false));
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+const categories: ProjectCategory[] = [
+  { id: "all", name: "All Projects", icon: Code, color: "text-emerald-500" },
+  { id: "AI/ML", name: "AI & ML", icon: Brain, color: "text-blue-500" },
+  { id: "Computer Vision", name: "Computer Vision", icon: Eye, color: "text-purple-500" },
+  { id: "NLP", name: "NLP", icon: MessageSquare, color: "text-green-500" },
+  { id: "Data Analytics", name: "Data Analytics", icon: BarChart3, color: "text-orange-500" },
+  { id: "Web Development", name: "Web Dev", icon: Globe, color: "text-cyan-500" },
+  { id: "IoT", name: "IoT", icon: Zap, color: "text-yellow-500" },
+  { id: "Healthcare", name: "Healthcare", icon: Heart, color: "text-red-500" },
+  { id: "Finance", name: "Finance", icon: DollarSign, color: "text-indigo-500" },
+  { id: "Mobile Development", name: "Mobile", icon: Smartphone, color: "text-pink-500" }
+];
+
+export const ProjectsSection = () => {
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [displayedProjects, setDisplayedProjects] = useState(projects);
+  const [projectCount, setProjectCount] = useState(0);
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { once: true, threshold: 0.1 });
 
   useEffect(() => {
-    const observers = itemRefs.current.map((ref, index) => {
-      if (!ref) return null;
-      
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setTimeout(() => {
-              setVisibleItems(prev => {
-                const newVisible = [...prev];
-                newVisible[index] = true;
-                return newVisible;
-              });
-            }, index * 50); // Reduced delay for larger grid
-          }
-        },
-        { threshold: 0.1 } // Reduced threshold for better performance
-      );
-      
-      observer.observe(ref);
-      return observer;
-    });
+    if (selectedCategory === "all") {
+      setDisplayedProjects(projects);
+    } else {
+      setDisplayedProjects(projects.filter(project => project.category === selectedCategory));
+    }
+  }, [selectedCategory]);
 
-    return () => {
-      observers.forEach(observer => observer?.disconnect());
-    };
-  }, []);
+  useEffect(() => {
+    if (isInView) {
+      const timer = setInterval(() => {
+        setProjectCount(prev => {
+          if (prev < projects.length) {
+            return prev + 1;
+          } else {
+            clearInterval(timer);
+            return projects.length;
+          }
+        });
+      }, 50);
+      return () => clearInterval(timer);
+    }
+  }, [isInView]);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.4,
+        ease: "easeOut"
+      }
+    }
+  };
 
   return (
-    <section id="projects" className="relative py-24 bg-black overflow-hidden">
-      {/* Background effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/3 to-transparent"></div>
-      <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-primary/5 rounded-full blur-2xl animate-pulse delay-300"></div>
-
-      <div className="container mx-auto px-6">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-6xl font-bold font-display text-white mb-4 tracking-tight">
-            OUR*PROJECTS
-          </h2>
-          <p className="text-muted text-lg max-w-2xl mx-auto">
-            Innovative AI/ML solutions and applications that solve real-world problems
-          </p>
-          <div className="mt-4 text-primary font-medium">
-            {projects.length} Projects • AI/ML • Data Science • Web Development
+    <section ref={sectionRef} className="py-24 px-4 md:px-8 bg-gradient-to-br from-background via-background to-muted/30">
+      <div className="max-w-7xl mx-auto">
+        {/* Section Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center mb-16"
+        >
+          <div className="inline-flex items-center gap-2 mb-4">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+            <span className="text-emerald-600 font-semibold uppercase tracking-wider text-sm">Portfolio</span>
+            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
           </div>
-        </div>
+          
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent mb-6">
+            AI & ML Projects
+          </h2>
+          
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+            Explore our comprehensive collection of cutting-edge AI, Machine Learning, and technology solutions
+            that are transforming industries and solving real-world problems.
+          </p>
+          
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={isInView ? { scale: 1 } : { scale: 0 }}
+            transition={{ duration: 0.6, delay: 0.3, type: "spring" }}
+            className="inline-flex items-center gap-4 bg-emerald-50 dark:bg-emerald-950/30 px-6 py-3 rounded-full border border-emerald-200 dark:border-emerald-800"
+          >
+            <div className="text-2xl font-bold text-emerald-600">{projectCount}</div>
+            <div className="text-muted-foreground">Projects Completed</div>
+          </motion.div>
+        </motion.div>
+
+        {/* Category Filter */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mb-12"
+        >
+          <div className="flex items-center gap-2 mb-6">
+            <Filter className="w-5 h-5 text-muted-foreground" />
+            <span className="text-sm font-medium text-muted-foreground">Filter by Category</span>
+          </div>
+          
+          <div className="flex flex-wrap gap-3">
+            {categories.map((category) => {
+              const IconComponent = category.icon;
+              const isActive = selectedCategory === category.id;
+              
+              return (
+                <motion.button
+                  key={category.id}
+                  onClick={() => setSelectedCategory(category.id)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                    isActive
+                      ? "bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-600 shadow-lg shadow-emerald-100 dark:shadow-emerald-900/20"
+                      : "bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground border border-border hover:border-emerald-200 dark:hover:border-emerald-800"
+                  }`}
+                >
+                  <IconComponent className={`w-4 h-4 ${isActive ? category.color : ""}`} />
+                  {category.name}
+                </motion.button>
+              );
+            })}
+          </div>
+        </motion.div>
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-8xl mx-auto">
-          {projects.map((project, index) => (
-            <div
-              key={index}
-              ref={el => itemRefs.current[index] = el}
-              onMouseEnter={() => setHoveredIndex(index)}
-              onMouseLeave={() => setHoveredIndex(null)}
-              className={`group relative overflow-hidden rounded-2xl bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-sm border border-white/10 hover:border-primary/30 transition-all duration-500 hover:scale-105 hover:shadow-[0_20px_60px_rgba(128,242,95,0.15)] ${
-                visibleItems[index] 
-                  ? 'opacity-100 translate-y-0' 
-                  : 'opacity-0 translate-y-12'
-              }`}
-              style={{ transitionDelay: `${index * 50}ms` }}
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        >
+          {displayedProjects.map((project, index) => (
+            <motion.div
+              key={project.id}
+              variants={cardVariants}
+              custom={index}
+              className="group"
             >
-              {/* Project Image */}
-              <div className="relative h-40 overflow-hidden">
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+              <div className="relative bg-card border border-border rounded-xl p-6 h-full transition-all duration-500 hover:border-emerald-200 dark:hover:border-emerald-800 hover:shadow-2xl hover:shadow-emerald-100/20 dark:hover:shadow-emerald-900/20 hover:-translate-y-2">
+                {/* Glow Effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-transparent to-blue-500/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-xl"></div>
                 
-                {/* Hover overlay */}
-                <div className={`absolute inset-0 bg-primary/20 transition-opacity duration-300 ${
-                  hoveredIndex === index ? 'opacity-100' : 'opacity-0'
-                }`}></div>
-              </div>
-
-              {/* Content */}
-              <div className="p-5">
-                <div className="mb-3">
-                  <h3 className="text-lg font-bold text-white mb-1 group-hover:text-primary transition-colors duration-300 line-clamp-2">
-                    {project.title}
-                  </h3>
-                  <p className="text-primary text-sm font-medium">
-                    {project.subtitle}
-                  </p>
+                {/* Project Header */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex-1">
+                    <h3 className="font-bold text-lg mb-2 text-foreground group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300 line-clamp-2">
+                      {project.title}
+                    </h3>
+                  </div>
+                  
+                  {project.isInDevelopment ? (
+                    <div className="flex items-center gap-2 text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-2 py-1 rounded-full">
+                      <Github className="w-3 h-3" />
+                      In Development
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      {project.demoUrl && project.demoUrl !== "#" && (
+                        <motion.a
+                          href={project.demoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          className="inline-flex items-center gap-1 text-xs bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 px-2 py-1 rounded-full hover:bg-emerald-200 dark:hover:bg-emerald-900/70 transition-colors duration-300"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          Demo
+                        </motion.a>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                <p className="text-muted text-sm mb-4 leading-relaxed group-hover:text-white transition-colors duration-300 line-clamp-3">
+                {/* Project Description */}
+                <p className="text-muted-foreground text-sm mb-4 line-clamp-3 leading-relaxed">
                   {project.description}
                 </p>
 
                 {/* Tags */}
-                <div className="flex flex-wrap gap-1 mb-4">
+                <div className="flex flex-wrap gap-2 mb-4">
                   {project.tags.slice(0, 3).map((tag, tagIndex) => (
                     <span
                       key={tagIndex}
-                      className="px-2 py-1 text-xs bg-primary/10 text-primary rounded-full border border-primary/20 group-hover:bg-primary/20 transition-colors duration-300"
+                      className="text-xs px-2 py-1 bg-muted text-muted-foreground rounded-md border border-border group-hover:border-emerald-200 dark:group-hover:border-emerald-800 transition-colors duration-300"
                     >
                       {tag}
                     </span>
                   ))}
+                  {project.tags.length > 3 && (
+                    <span className="text-xs px-2 py-1 bg-muted text-muted-foreground rounded-md border border-border">
+                      +{project.tags.length - 3}
+                    </span>
+                  )}
                 </div>
 
-                {/* Action Button */}
-                {project.demoLink && project.demoLink !== "#" ? (
-                  <a
-                    href={project.demoLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 hover:bg-primary text-primary hover:text-black rounded-full text-sm font-medium transition-all duration-300 group-hover:scale-105"
-                  >
-                    <ExternalLink size={14} />
-                    View Demo
-                  </a>
-                ) : (
-                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 text-muted rounded-full text-sm">
-                    <Github size={14} />
-                    In Development
-                  </div>
-                )}
+                {/* Category Badge */}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                    {project.category}
+                  </span>
+                  
+                  {project.demoUrl && project.demoUrl !== "#" && !project.isInDevelopment && (
+                    <motion.div
+                      className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    />
+                  )}
+                </div>
+
+                {/* Hover Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-emerald-600/5 via-transparent to-transparent rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
               </div>
-
-              {/* Animated border */}
-              <div className="absolute inset-0 rounded-2xl border border-primary/0 group-hover:border-primary/50 transition-all duration-500"></div>
-              
-              {/* Corner accent */}
-              <div className="absolute top-4 right-4 w-2 h-2 bg-primary rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* View All Projects CTA */}
-        <div className="text-center mt-16">
-          <div className="inline-flex items-center gap-4 px-8 py-4 bg-gradient-to-r from-primary/10 to-primary/20 rounded-full border border-primary/30 hover:border-primary/50 transition-all duration-300 group cursor-pointer">
-            <span className="text-white font-medium">Explore {projects.length}+ AI/ML Projects</span>
-            <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+        {/* Bottom CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8, delay: 0.6 }}
+          className="text-center mt-16"
+        >
+          <div className="inline-flex items-center gap-4 bg-gradient-to-r from-emerald-50 via-white to-emerald-50 dark:from-emerald-950/30 dark:via-background dark:to-emerald-950/30 px-8 py-4 rounded-2xl border border-emerald-200 dark:border-emerald-800 shadow-lg">
+            <div className="text-sm text-muted-foreground">
+              Interested in collaborating on innovative AI solutions?
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-300"
+            >
+              Get In Touch
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
       </div>
-
-      {/* Decorative elements */}
-      <div className="absolute top-20 left-10 w-16 h-16 border border-primary/20 rounded-full animate-pulse"></div>
-      <div className="absolute bottom-20 right-10 w-20 h-20 border border-primary/20 rounded-full animate-pulse delay-300"></div>
     </section>
   );
-}
+};

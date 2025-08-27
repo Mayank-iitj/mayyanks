@@ -1,237 +1,313 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
 
-const PlusIcon = () => (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="flex-shrink-0 text-primary transition-transform duration-300 group-hover:rotate-90"
-    >
-      <path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-);
+import { useState, useEffect, useRef } from 'react';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
-const Tag = ({ text, index }: { text: string; index: number }) => (
-  <div 
-    className="group flex items-center gap-4 whitespace-nowrap px-6 transition-all duration-300 hover:scale-110 hover:text-primary"
-    style={{ animationDelay: `${index * 0.1}s` }}
-  >
-    <PlusIcon />
-    <p className="font-body text-xl font-medium tracking-tight text-white transition-colors duration-300 group-hover:text-primary">
-      {text}
-    </p>
-  </div>
-);
+interface MousePosition {
+  x: number;
+  y: number;
+}
 
-const HeroSection = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+export const Hero = () => {
+  const [mousePosition, setMousePosition] = useState<MousePosition>({ x: 0, y: 0 });
   const [isLoaded, setIsLoaded] = useState(false);
+  const heroRef = useRef<HTMLElement>(null);
+  
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"]
+  });
+  
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.5], [1, 0.95]);
+  
+  const springConfig = { stiffness: 100, damping: 30 };
+  const mouseX = useSpring(0, springConfig);
+  const mouseY = useSpring(0, springConfig);
 
   useEffect(() => {
     setIsLoaded(true);
     
     const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth) * 2 - 1,
-        y: (e.clientY / window.innerHeight) * 2 - 1,
-      });
+      if (heroRef.current) {
+        const rect = heroRef.current.getBoundingClientRect();
+        const x = (e.clientX - rect.left - rect.width / 2) / rect.width;
+        const y = (e.clientY - rect.top - rect.height / 2) / rect.height;
+        
+        setMousePosition({ x: e.clientX, y: e.clientY });
+        mouseX.set(x * 20);
+        mouseY.set(y * 20);
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  }, [mouseX, mouseY]);
 
-  const tags = [
-    'Machine Learning',
-    'Deep Learning',
-    'Computer Vision',
-    'NLP',
-    'Data Science',
-    'AI Models',
-    'Python',
-    'TensorFlow',
-    'PyTorch',
-    'Generative AI',
-    'Cloud AI',
-    'LLMs',
-  ];
+  const scrollToProjects = () => {
+    const projectsSection = document.getElementById('projects');
+    if (projectsSection) {
+      projectsSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+        delayChildren: 0.3
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { 
+      opacity: 0, 
+      y: 50,
+      filter: "blur(10px)"
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      filter: "blur(0px)",
+      transition: {
+        duration: 0.8,
+        ease: [0.22, 1, 0.36, 1]
+      }
+    }
+  };
+
+  const textVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut"
+      }
+    }
+  };
 
   return (
-    <section
-      id="hero-section"
-      className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-black py-32"
+    <section 
+      ref={heroRef}
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-background via-background to-muted/20"
     >
-      {/* Enhanced marquee animation with hover effects */}
-      <div className="absolute top-32 left-0 w-full overflow-hidden group/marquee" style={{ willChange: 'transform' }}>
-        <div className="flex animate-marquee whitespace-nowrap group-hover/marquee:[animation-play-state:paused] transition-all duration-300">
-          {[...tags, ...tags].map((tag, index) => (
-            <Tag key={index} text={tag} index={index} />
-          ))}
-        </div>
+      {/* Background Effects */}
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-emerald-600/10" />
+      
+      {/* Animated Background Grid */}
+      <div className="absolute inset-0 opacity-20">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:64px_64px]" />
       </div>
 
-      <div className="container relative z-10 mt-16 flex flex-col items-center text-center">
-        <div className="relative mb-[-120px] h-[400px] w-full max-w-4xl sm:h-[500px] lg:mb-[-220px] lg:h-[600px]">
-          {/* Enhanced Geometric Outline with parallax */}
-          <div
-            className={`absolute inset-0 flex items-center justify-center transition-all duration-1500 ${
-              isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-            }`}
-            style={{ 
-              perspective: '1200px',
-              transform: `translateX(${mousePosition.x * 10}px) translateY(${mousePosition.y * 10}px)`
-            }}
-          >
-            <div
-              className="relative h-[300px] w-full max-w-[500px] md:h-[400px] md:max-w-[700px] lg:h-[500px] lg:max-w-[840px] group/geometric"
-              style={{ transform: 'rotateX(15deg) rotateY(-25deg)', transformStyle: 'preserve-3d' }}
-            >
-              <div className="absolute inset-0 border border-primary transition-all duration-500 group-hover/geometric:border-primary/70 group-hover/geometric:shadow-[0_0_50px_rgba(128,242,95,0.3)]"></div>
-              <div className="absolute inset-0 border border-primary/30 transition-all duration-500 group-hover/geometric:border-primary/50" style={{ transform: 'translateZ(-80px)' }}></div>
-              
-              {/* Animated corner accents */}
-              <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-primary animate-pulse"></div>
-              <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-primary animate-pulse"></div>
-              <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-primary animate-pulse"></div>
-              <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-primary animate-pulse"></div>
-            </div>
-          </div>
-          
-          {/* Enhanced floating images with parallax and hover effects */}
-          <div
-            className={`group/image1 absolute left-[5%] top-[10%] w-[50%] md:left-[10%] md:top-[5%] md:w-[45%] transition-all duration-1000 hover:scale-110 hover:rotate-1 ${
-              isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
-            }`}
-            style={{
-              transform: `perspective(1200px) rotateX(10deg) rotateY(-20deg) scale(1.1) translateX(${mousePosition.x * -5}px) translateY(${mousePosition.y * -5}px)`,
-              borderRadius: '16px',
-              overflow: 'hidden',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-              transitionDelay: '0.3s'
-            }}
-          >
-            <Image
-              src="https://framerusercontent.com/images/Wz3hFd8Q00IPgx6kaYPHaCCHOmo.png"
-              alt="AI Project Visual 1"
-              width={400}
-              height={550}
-              className="h-full w-full object-cover transition-all duration-500 group-hover/image1:brightness-110 group-hover/image1:contrast-110"
-              priority
-            />
-            <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover/image1:opacity-100 transition-opacity duration-300"></div>
-          </div>
+      {/* Mouse Tracking Gradient */}
+      <motion.div
+        className="absolute inset-0 opacity-30 pointer-events-none"
+        style={{
+          background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(34, 197, 94, 0.1), transparent 40%)`
+        }}
+      />
 
-          <div
-            className={`group/image2 absolute right-[5%] top-[5%] w-[45%] md:right-[15%] md:w-[40%] transition-all duration-1000 hover:scale-110 hover:-rotate-1 ${
-              isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
-            }`}
-            style={{
-              transform: `perspective(1200px) rotateX(5deg) rotateY(15deg) translateZ(100px) scale(0.9) translateX(${mousePosition.x * 5}px) translateY(${mousePosition.y * 5}px)`,
-              borderRadius: '16px',
-              overflow: 'hidden',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-              transitionDelay: '0.5s'
-            }}
-          >
-            <Image
-              src="https://framerusercontent.com/images/uxNbVYg6JF1nOlix86r82F8kT0.png"
-              alt="AI Project Visual 2"
-              width={350}
-              height={500}
-              className="h-full w-full object-cover transition-all duration-500 group-hover/image2:brightness-110 group-hover/image2:contrast-110"
-              priority
-            />
-            <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover/image2:opacity-100 transition-opacity duration-300"></div>
-          </div>
-        </div>
+      {/* Floating Elements */}
+      <motion.div
+        style={{ x: mouseX, y: mouseY }}
+        className="absolute top-1/4 left-1/4 w-2 h-2 bg-emerald-500 rounded-full opacity-60"
+        animate={{
+          y: [0, -20, 0]
+        }}
+        transition={{
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+      />
+      
+      <motion.div
+        style={{ x: mouseX, y: mouseY }}
+        className="absolute top-1/3 right-1/4 w-1 h-1 bg-emerald-400 rounded-full opacity-40"
+        animate={{
+          y: [0, -15, 0],
+          x: [0, 10, 0]
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 1
+        }}
+      />
 
-        {/* Enhanced main title with text reveal animation */}
-        <h1
-          className={`font-display text-[13vw] font-black uppercase leading-none text-white md:text-[12vw] lg:text-[10rem] group/title transition-all duration-1000 hover:scale-105 ${
-            isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-75'
-          }`}
-          style={{ 
-            letterSpacing: '-0.02em',
-            transitionDelay: '0.8s'
-          }}
+      <motion.div
+        style={{ x: mouseX, y: mouseY }}
+        className="absolute bottom-1/3 left-1/3 w-3 h-3 bg-emerald-300/30 rounded-full"
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.6, 0.3]
+        }}
+        transition={{
+          duration: 3,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 2
+        }}
+      />
+
+      {/* Main Content */}
+      <motion.div
+        style={{ y, opacity, scale }}
+        variants={containerVariants}
+        initial="hidden"
+        animate={isLoaded ? "visible" : "hidden"}
+        className="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 text-center"
+      >
+        {/* Badge */}
+        <motion.div
+          variants={itemVariants}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 backdrop-blur-sm mb-8"
         >
-          <span className="inline-block transition-all duration-300 hover:text-primary hover:rotate-1">
-            Mayank
+          <Sparkles className="w-4 h-4 text-emerald-500" />
+          <span className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+            AI-Powered Design Solutions
           </span>
-          <span className="text-primary animate-pulse transition-all duration-300 hover:scale-125">*</span>
-          <span className="inline-block transition-all duration-300 hover:text-primary hover:-rotate-1">
-            Sharma
-          </span>
-        </h1>
-        
-        {/* Enhanced bottom section with staggered animations */}
-        <div className={`mt-12 grid w-full max-w-6xl grid-cols-1 items-end gap-8 px-4 md:mt-24 md:grid-cols-3 transition-all duration-1200 ${
-          isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`} style={{ transitionDelay: '1.2s' }}>
-          <div className="text-left md:col-span-1 group/desc">
-            <p className="max-w-sm font-body text-lg text-muted transition-all duration-500 group-hover/desc:text-white/90 group-hover/desc:scale-105">
-              Specializing in AI/ML solutions, building intelligent systems that drive innovation and transform data into actionable insights.
-            </p>
-          </div>
-          
-          <div className="flex justify-center md:col-span-1">
-            <Link 
-              href="/projects" 
-              className="group/cta btn bg-secondary text-secondary-foreground shadow-lg transition-all duration-300 ease-out hover:scale-110 hover:brightness-110 hover:shadow-[0_0_30px_rgba(128,242,95,0.4)] relative overflow-hidden"
-            >
-              <span className="relative z-10 transition-transform duration-300 group-hover/cta:scale-110">
-                Our Projects
-              </span>
-              
-              {/* Animated background */}
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary scale-x-0 group-hover/cta:scale-x-100 transition-transform duration-300 origin-left"></div>
-              
-              {/* Ripple effect */}
-              <div className="absolute inset-0 bg-primary/30 rounded-full scale-0 group-active/cta:scale-150 transition-transform duration-200 opacity-0 group-active/cta:opacity-100"></div>
-            </Link>
-          </div>
-          
-          <div className="text-right font-body text-sm uppercase tracking-wider text-muted group/info transition-all duration-500 hover:text-primary/80">
-            <p className="transition-transform duration-300 hover:translate-x-2">*ESTABLISHED — 2024</p>
-            <p className="transition-transform duration-300 hover:translate-x-2">BASED IN INDIA</p>
-          </div>
-        </div>
-      </div>
+        </motion.div>
 
-      {/* Enhanced background elements with animated gradients */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className={`absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl transition-all duration-3000 ${
-          isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
-        }`} style={{ 
-          transform: `translateX(${mousePosition.x * 20}px) translateY(${mousePosition.y * 20}px)` 
-        }}></div>
-        <div className={`absolute bottom-1/4 right-1/4 w-64 h-64 bg-primary/5 rounded-full blur-3xl transition-all duration-3000 ${
-          isLoaded ? 'opacity-100 scale-100' : 'opacity-0 scale-0'
-        }`} style={{ 
-          transform: `translateX(${mousePosition.x * -15}px) translateY(${mousePosition.y * -15}px)` 
-        }}></div>
-        
-        {/* Floating particles */}
-        {[...Array(5)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-2 h-2 bg-primary/30 rounded-full animate-pulse"
-            style={{
-              top: `${20 + i * 15}%`,
-              left: `${10 + i * 20}%`,
-              animationDelay: `${i * 0.5}s`,
-              transform: `translateX(${mousePosition.x * (i + 1) * 3}px) translateY(${mousePosition.y * (i + 1) * 3}px)`
-            }}
-          ></div>
-        ))}
-      </div>
+        {/* Main Heading */}
+        <motion.h1
+          variants={itemVariants}
+          className="text-4xl sm:text-5xl lg:text-7xl xl:text-8xl font-bold tracking-tight mb-8"
+        >
+          <motion.span
+            className="block bg-gradient-to-r from-foreground via-foreground to-emerald-600 bg-clip-text text-transparent"
+            variants={textVariants}
+          >
+            Transform Your
+          </motion.span>
+          <motion.span
+            className="block bg-gradient-to-r from-emerald-500 to-emerald-600 bg-clip-text text-transparent"
+            variants={textVariants}
+            transition={{ delay: 0.2 }}
+          >
+            Digital Vision
+          </motion.span>
+          <motion.span
+            className="block bg-gradient-to-r from-foreground via-foreground to-emerald-600 bg-clip-text text-transparent"
+            variants={textVariants}
+            transition={{ delay: 0.4 }}
+          >
+            Into Reality
+          </motion.span>
+        </motion.h1>
+
+        {/* Subheading */}
+        <motion.p
+          variants={itemVariants}
+          className="text-lg sm:text-xl lg:text-2xl text-muted-foreground max-w-4xl mx-auto mb-12 leading-relaxed"
+        >
+          We craft cutting-edge digital experiences using AI/ML solutions, 
+          innovative design principles, and modern technology to bring your 
+          boldest ideas to life with precision and creativity.
+        </motion.p>
+
+        {/* CTA Button */}
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+        >
+          <motion.button
+            onClick={scrollToProjects}
+            className="group relative px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full font-semibold text-lg transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-emerald-500/25 overflow-hidden"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <span className="relative z-10 flex items-center gap-2">
+              Explore Our Work
+              <motion.div
+                animate={{ x: [0, 5, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                <ArrowRight className="w-5 h-5" />
+              </motion.div>
+            </span>
+            
+            {/* Button Background Effect */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-500"
+              initial={{ x: "-100%" }}
+              whileHover={{ x: "0%" }}
+              transition={{ duration: 0.3 }}
+            />
+          </motion.button>
+
+          <motion.div
+            className="text-sm text-muted-foreground"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5 }}
+          >
+            Scroll to discover more
+          </motion.div>
+        </motion.div>
+
+        {/* Stats */}
+        <motion.div
+          variants={itemVariants}
+          className="grid grid-cols-1 sm:grid-cols-3 gap-8 mt-20 pt-12 border-t border-border/50"
+        >
+          {[
+            { number: "50+", label: "Projects Delivered" },
+            { number: "98%", label: "Client Satisfaction" },
+            { number: "24/7", label: "Support Available" }
+          ].map((stat, index) => (
+            <motion.div
+              key={index}
+              className="text-center"
+              whileHover={{ y: -5 }}
+              transition={{ duration: 0.2 }}
+            >
+              <motion.div
+                className="text-3xl sm:text-4xl font-bold text-emerald-600 mb-2"
+                initial={{ opacity: 0, scale: 0.5 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.8 + index * 0.1 }}
+              >
+                {stat.number}
+              </motion.div>
+              <div className="text-muted-foreground text-sm">
+                {stat.label}
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </motion.div>
+
+      {/* Scroll Indicator */}
+      <motion.div
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 2 }}
+      >
+        <motion.div
+          className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center"
+          animate={{ borderColor: ["rgba(156, 163, 175, 0.3)", "rgba(34, 197, 94, 0.5)", "rgba(156, 163, 175, 0.3)"] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <motion.div
+            className="w-1 h-2 bg-emerald-500 rounded-full mt-2"
+            animate={{ y: [0, 12, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          />
+        </motion.div>
+      </motion.div>
     </section>
   );
 };
-
-export default HeroSection;

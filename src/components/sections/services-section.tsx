@@ -1,92 +1,163 @@
-import React from 'react';
+"use client";
 
-const servicesData = [
+import React from 'react';
+import { motion } from 'framer-motion';
+import { useInView } from 'framer-motion';
+import { useRef } from 'react';
+import { 
+  Brain, 
+  BarChart3, 
+  Globe, 
+  Smartphone, 
+  Palette, 
+  Users 
+} from 'lucide-react';
+
+interface Service {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+}
+
+const services: Service[] = [
   {
-    title: "Machine Learning Model Development",
-    description: "Crafting tailored algorithms and models to solve complex problems and drive predictive insights.",
+    icon: Brain,
+    title: "AI/ML Development",
+    description: "Cutting-edge artificial intelligence and machine learning solutions to automate processes and drive intelligent decision-making for your business."
   },
   {
-    title: "Computer Vision Systems",
-    description: "Developing advanced systems for image recognition, object detection, and video analysis.",
+    icon: BarChart3,
+    title: "Data Analytics",
+    description: "Transform raw data into actionable insights with advanced analytics, visualization, and business intelligence solutions tailored to your needs."
   },
   {
-    title: "Natural Language Processing",
-    description: "Building applications that understand, interpret, and generate human language.",
+    icon: Globe,
+    title: "Web Development",
+    description: "Modern, responsive web applications built with the latest technologies, ensuring optimal performance and exceptional user experiences."
   },
   {
-    title: "Deep Learning Solutions",
-    description: "Implementing cutting-edge neural networks for tasks requiring high levels of abstraction.",
+    icon: Smartphone,
+    title: "Mobile App Development",
+    description: "Native and cross-platform mobile applications that deliver seamless functionality across iOS and Android devices."
   },
   {
-    title: "Data Analysis & Visualization",
-    description: "Transforming raw data into actionable insights and compelling visual stories.",
+    icon: Palette,
+    title: "UI/UX Design",
+    description: "User-centered design solutions that combine aesthetic excellence with intuitive functionality to create memorable digital experiences."
   },
   {
-    title: "AI Model Deployment",
-    description: "Seamlessly integrating and scaling AI models into production environments for real-world impact.",
-  },
-  {
-    title: "Predictive Analytics",
-    description: "Leveraging historical data to forecast future trends and business outcomes with high accuracy.",
-  },
-  {
-    title: "Neural Networks",
-    description: "Designing and optimizing custom neural network architectures for specialized tasks.",
-  },
-  {
-    title: "MLOps",
-    description: "Streamlining the machine learning lifecycle from development to deployment and monitoring.",
-  },
-  {
-    title: "AI Consulting",
-    description: "Providing expert strategic guidance to help businesses leverage AI for competitive advantage.",
-  },
-  {
-    title: "Research & Development",
-    description: "Pushing the boundaries of AI through innovative research and experimentation with novel techniques.",
-  },
-  {
-    title: "Custom AI Solutions",
-    description: "Building bespoke AI systems from the ground up to address unique business challenges.",
-  },
+    icon: Users,
+    title: "Consulting",
+    description: "Strategic technology consulting to help you navigate digital transformation and optimize your business processes for maximum efficiency."
+  }
 ];
 
-const ServicesSection = () => {
-  return (
-    <section id="services" className="bg-background py-[120px]">
-      <div className="container mx-auto px-6">
-        <h2 className="mb-[80px] text-center font-display text-4xl font-bold uppercase tracking-[0.05em] text-foreground">
-          SERVICES
-        </h2>
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.3
+    }
+  }
+};
 
-        <div className="mx-auto flex max-w-[1008px] flex-col gap-12">
-          {servicesData.map((service, index) => (
-            <div
-              key={index}
-              className="flex w-full flex-col gap-8 border-b border-border pb-12 last:border-b-0 last:pb-0 md:flex-row md:justify-between"
-            >
-              <div className="flex-shrink-0 md:w-[320px]">
-                <div className="flex flex-col gap-4">
-                  <p className="font-display text-5xl font-bold text-primary">
-                    {String(index + 1).padStart(2, '0')}
-                  </p>
-                  <h3 className="font-display text-4xl font-medium text-foreground">
-                    {service.title}
-                  </h3>
+const cardVariants = {
+  hidden: { 
+    opacity: 0, 
+    y: 60,
+    scale: 0.8
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 12,
+      duration: 0.8
+    }
+  }
+};
+
+export const Services = () => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
+
+  return (
+    <section className="py-20 px-4 bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
+            Our Services
+          </h2>
+          <div className="w-24 h-1 bg-gradient-to-r from-primary to-chart-1 mx-auto rounded-full"></div>
+        </motion.div>
+
+        <motion.div
+          ref={ref}
+          variants={containerVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+        >
+          {services.map((service, index) => {
+            const IconComponent = service.icon;
+            return (
+              <motion.div
+                key={service.title}
+                variants={cardVariants}
+                whileHover={{ 
+                  scale: 1.05, 
+                  y: -10,
+                  transition: { type: "spring", stiffness: 300, damping: 20 }
+                }}
+                whileTap={{ scale: 0.98 }}
+                className="group relative overflow-hidden"
+              >
+                <div className="relative bg-card border border-border rounded-xl p-8 h-full shadow-lg hover:shadow-2xl transition-all duration-500 bg-gradient-to-br from-card via-card to-accent/10">
+                  {/* Animated background gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-chart-1/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl"></div>
+                  
+                  {/* Glow effect */}
+                  <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 to-chart-1/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+
+                  <div className="relative z-10">
+                    <div className="mb-6 relative">
+                      <div className="w-16 h-16 bg-gradient-to-br from-primary to-chart-1 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg">
+                        <IconComponent className="w-8 h-8 text-primary-foreground" />
+                      </div>
+                      
+                      {/* Icon background glow */}
+                      <div className="absolute inset-0 w-16 h-16 bg-gradient-to-br from-primary to-chart-1 rounded-xl blur-md opacity-0 group-hover:opacity-30 transition-opacity duration-300 -z-10"></div>
+                    </div>
+
+                    <h3 className="text-xl font-semibold mb-4 text-card-foreground group-hover:text-primary transition-colors duration-300">
+                      {service.title}
+                    </h3>
+
+                    <p className="text-muted-foreground leading-relaxed group-hover:text-card-foreground/80 transition-colors duration-300">
+                      {service.description}
+                    </p>
+                  </div>
+
+                  {/* Border animation */}
+                  <div className="absolute inset-0 rounded-xl border-2 border-transparent bg-gradient-to-r from-primary to-chart-1 bg-clip-border opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="absolute inset-[2px] rounded-[10px] bg-card"></div>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex-1 md:max-w-[480px] md:pt-[74px]">
-                <p className="font-body text-lg leading-relaxed text-muted">
-                  {service.description}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
       </div>
     </section>
   );
 };
-
-export default ServicesSection;
