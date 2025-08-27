@@ -71,7 +71,7 @@ export const Navigation = () => {
               onClick={() => scrollToSection('home')}
               className="text-2xl md:text-3xl font-bold text-foreground hover:text-primary transition-colors duration-200"
             >
-              DesignCube
+              Mayank Sharma
             </button>
           </div>
 

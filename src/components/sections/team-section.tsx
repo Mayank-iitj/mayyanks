@@ -14,7 +14,6 @@ interface TeamMember {
     linkedin?: string;
     twitter?: string;
   };
-  avatar: string;
 }
 
 const teamMember: TeamMember = {
@@ -24,11 +23,10 @@ const teamMember: TeamMember = {
   skills: ["Machine Learning", "Deep Learning", "Python", "TensorFlow", "PyTorch", "Natural Language Processing"],
   experience: "5+ years in AI/ML development",
   social: {
-    instagram: "https://instagram.com/mayank",
-    linkedin: "https://linkedin.com/in/mayank-sharma",
-    twitter: "https://twitter.com/mayank"
-  },
-  avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face"
+    instagram: "https://instagram.com/mayyanks",
+    linkedin: "https://linkedin.com/in/mayank-iitj",
+    twitter: "https://twitter.com/mayyankks"
+  }
 };
 
 export const TeamSection = () => {
@@ -44,7 +42,7 @@ export const TeamSection = () => {
           className="text-center mb-12"
         >
           <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Meet Our Team
+            Meet the Founder
           </h2>
           <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
         </motion.div>
@@ -60,24 +58,8 @@ export const TeamSection = () => {
             className="max-w-md w-full"
           >
             <div className="bg-card rounded-2xl border border-border shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group">
-              {/* Avatar Section */}
-              <div className="relative p-8 pb-0">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.3 }}
-                  className="relative mx-auto w-32 h-32 rounded-full overflow-hidden ring-4 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300"
-                >
-                  <img
-                    src={teamMember.avatar}
-                    alt={`${teamMember.name} profile`}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                </motion.div>
-              </div>
-
               {/* Content Section */}
-              <div className="p-8 pt-4">
+              <div className="p-8">
                 <div className="text-center mb-6">
                   <h3 className="text-2xl font-bold text-card-foreground mb-2">
                     {teamMember.name}
