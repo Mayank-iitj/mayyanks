@@ -1,103 +1,131 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, Quote, Star } from "lucide-react";
 
 interface Testimonial {
   id: number;
   name: string;
-  title: string;
+  role: string;
   company: string;
-  review: string;
+  content: string;
   rating: number;
-  avatar: string;
+  avatar: {
+    color: string;
+    initials: string;
+  };
 }
 
 const testimonials: Testimonial[] = [
   {
     id: 1,
-    name: "Dr. Anya Sharma",
-    title: "Chief Data Scientist",
-    company: "TechMed Solutions",
-    review: "Their AI/ML expertise transformed our healthcare data analytics. The team delivered a sophisticated machine learning model that improved our diagnostic accuracy by 40%. Outstanding technical depth and professional execution.",
+    name: "Sarah Chen",
+    role: "Product Manager",
+    company: "TechFlow Solutions",
+    content: "The attention to detail and innovative approach exceeded our expectations. The project was delivered on time with exceptional quality that transformed our user experience.",
     rating: 5,
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b630?w=150&h=150&fit=crop&crop=face&auto=format&q=80"
+    avatar: {
+      color: "bg-emerald-500",
+      initials: "SC"
+    }
   },
   {
     id: 2,
-    name: "Ben Carter",
-    title: "VP of Engineering",
-    company: "FinTech Innovations",
-    review: "Exceptional work on our fraud detection system. They built a real-time ML pipeline that processes millions of transactions daily with 99.7% accuracy. The code quality and documentation were impeccable.",
+    name: "Michael Rodriguez",
+    role: "CTO",
+    company: "Digital Dynamics",
+    content: "Outstanding technical expertise and creative problem-solving. The solution not only met our requirements but also provided insights we hadn't considered.",
     rating: 5,
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face&auto=format&q=80"
+    avatar: {
+      color: "bg-emerald-600",
+      initials: "MR"
+    }
   },
   {
     id: 3,
-    name: "Chloe Davis",
-    title: "Product Director",
-    company: "RetailAI Corp",
-    review: "Their recommendation engine revolutionized our e-commerce platform. Customer engagement increased by 65% and sales conversion improved dramatically. The team's attention to detail and innovative approach exceeded expectations.",
+    name: "Emily Watson",
+    role: "Design Director",
+    company: "Creative Studios Inc",
+    content: "Exceptional collaboration and communication throughout the project. The final deliverable was polished, professional, and exactly what we envisioned.",
     rating: 5,
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face&auto=format&q=80"
+    avatar: {
+      color: "bg-emerald-400",
+      initials: "EW"
+    }
   },
   {
     id: 4,
-    name: "Michael Lee",
-    title: "CTO",
-    company: "AutoDrive Systems",
-    review: "Delivered a cutting-edge computer vision system for autonomous vehicles. Their deep learning models achieved state-of-the-art performance in object detection and tracking. Truly world-class technical expertise.",
+    name: "David Kim",
+    role: "Founder",
+    company: "StartUp Innovate",
+    content: "Incredible value and expertise. The strategic insights and implementation quality helped us launch our product successfully in a competitive market.",
     rating: 5,
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face&auto=format&q=80"
+    avatar: {
+      color: "bg-emerald-700",
+      initials: "DK"
+    }
+  },
+  {
+    id: 5,
+    name: "Lisa Thompson",
+    role: "Operations Manager",
+    company: "Global Enterprises",
+    content: "Professional, reliable, and results-driven. The project management was seamless, and the outcome significantly improved our operational efficiency.",
+    rating: 5,
+    avatar: {
+      color: "bg-emerald-500",
+      initials: "LT"
+    }
   }
 ];
 
-export const Testimonials = () => {
+export const TestimonialsSection = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
   const nextTestimonial = useCallback(() => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
+    setCurrentIndex((prev) => (prev + 1) % testimonials.length);
   }, []);
 
   const prevTestimonial = useCallback(() => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + testimonials.length) % testimonials.length);
+    setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   }, []);
 
   const goToTestimonial = useCallback((index: number) => {
     setCurrentIndex(index);
   }, []);
 
+  // Auto-play functionality
   useEffect(() => {
     if (!isAutoPlaying) return;
 
-    const interval = setInterval(nextTestimonial, 5000);
+    const interval = setInterval(() => {
+      nextTestimonial();
+    }, 5000);
+
     return () => clearInterval(interval);
   }, [isAutoPlaying, nextTestimonial]);
 
-  const handleMouseEnter = useCallback(() => {
-    setIsAutoPlaying(false);
-  }, []);
-
-  const handleMouseLeave = useCallback(() => {
-    setIsAutoPlaying(true);
-  }, []);
+  // Pause auto-play on hover
+  const handleMouseEnter = () => setIsAutoPlaying(false);
+  const handleMouseLeave = () => setIsAutoPlaying(true);
 
   const renderStars = (rating: number) => {
-    return Array.from({ length: 5 }, (_, index) => (
+    return Array.from({ length: 5 }, (_, i) => (
       <Star
-        key={index}
-        className={`w-5 h-5 ${
-          index < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+        key={i}
+        className={`w-4 h-4 ${
+          i < rating ? "fill-emerald-500 text-emerald-500" : "text-gray-300"
         }`}
       />
     ));
   };
 
   return (
-    <section className="py-20 bg-gradient-to-br from-background via-muted/20 to-background">
-      <div className="container mx-auto px-4">
+    <section className="py-20 bg-gradient-to-br from-emerald-50/50 to-white dark:from-emerald-950/20 dark:to-background">
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -105,18 +133,21 @@ export const Testimonials = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-            What Our Clients Say
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+            What Clients Say
           </h2>
-          <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Don't just take our word for it. Here's what our valued clients have to say about their experience working with us.
+          </p>
         </motion.div>
 
-        <div className="relative max-w-6xl mx-auto">
-          <div
-            className="relative overflow-hidden"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
+        {/* Testimonial Carousel */}
+        <div
+          className="relative"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+        >
+          <div className="overflow-hidden">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}
@@ -124,138 +155,122 @@ export const Testimonials = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -100 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
-                className="grid md:grid-cols-2 gap-8 items-center"
+                className="w-full"
               >
-                <motion.div
-                  className="relative"
-                  whileHover={{ scale: 1.02 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="bg-card rounded-2xl p-8 shadow-lg border border-border hover:shadow-xl transition-shadow duration-300">
-                    <div className="flex items-center mb-6">
-                      <motion.div
-                        className="relative w-16 h-16 rounded-full overflow-hidden mr-4"
-                        whileHover={{ scale: 1.1 }}
-                        transition={{ duration: 0.3 }}
+                <div className="bg-white dark:bg-card rounded-2xl p-8 md:p-12 shadow-lg border border-emerald-100 dark:border-emerald-900/20 relative overflow-hidden">
+                  {/* Background Quote Icon */}
+                  <div className="absolute top-6 right-8 opacity-10">
+                    <Quote className="w-24 h-24 text-emerald-500" />
+                  </div>
+
+                  {/* Content */}
+                  <div className="relative z-10">
+                    {/* Rating */}
+                    <div className="flex items-center gap-1 mb-6">
+                      {renderStars(testimonials[currentIndex].rating)}
+                    </div>
+
+                    {/* Testimonial Content */}
+                    <blockquote className="text-lg md:text-xl text-foreground leading-relaxed mb-8">
+                      "{testimonials[currentIndex].content}"
+                    </blockquote>
+
+                    {/* Client Info */}
+                    <div className="flex items-center gap-4">
+                      {/* Avatar */}
+                      <div
+                        className={`${testimonials[currentIndex].avatar.color} w-16 h-16 rounded-full flex items-center justify-center text-white font-semibold text-lg shadow-lg`}
                       >
-                        <img
-                          src={testimonials[currentIndex].avatar}
-                          alt={testimonials[currentIndex].name}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-                      </motion.div>
+                        {testimonials[currentIndex].avatar.initials}
+                      </div>
+
+                      {/* Client Details */}
                       <div>
-                        <h3 className="text-xl font-semibold text-foreground">
+                        <h4 className="font-semibold text-lg text-foreground">
                           {testimonials[currentIndex].name}
-                        </h3>
-                        <p className="text-muted-foreground">
-                          {testimonials[currentIndex].title}
+                        </h4>
+                        <p className="text-emerald-600 dark:text-emerald-400 font-medium">
+                          {testimonials[currentIndex].role}
                         </p>
-                        <p className="text-primary font-medium">
+                        <p className="text-muted-foreground">
                           {testimonials[currentIndex].company}
                         </p>
                       </div>
                     </div>
-                    
-                    <div className="flex mb-4">
-                      {renderStars(testimonials[currentIndex].rating)}
-                    </div>
-                    
-                    <motion.blockquote
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.2, duration: 0.5 }}
-                      className="text-foreground leading-relaxed text-lg italic"
-                    >
-                      "{testimonials[currentIndex].review}"
-                    </motion.blockquote>
                   </div>
-                </motion.div>
-
-                <motion.div
-                  className="hidden md:block"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
-                >
-                  <div className="relative">
-                    <motion.div
-                      className="w-80 h-80 mx-auto rounded-full overflow-hidden shadow-2xl"
-                      whileHover={{ scale: 1.05, rotate: 2 }}
-                      transition={{ duration: 0.4 }}
-                    >
-                      <img
-                        src={testimonials[currentIndex].avatar}
-                        alt={testimonials[currentIndex].name}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/10"></div>
-                    </motion.div>
-                    
-                    <motion.div
-                      className="absolute -top-4 -right-4 w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg"
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-                    >
-                      <Star className="w-6 h-6 text-primary-foreground fill-current" />
-                    </motion.div>
-                  </div>
-                </motion.div>
+                </div>
               </motion.div>
             </AnimatePresence>
           </div>
 
-          <div className="flex justify-center items-center mt-12 space-x-6">
-            <motion.button
-              onClick={prevTestimonial}
-              className="p-3 rounded-full bg-card border border-border hover:bg-accent hover:border-primary transition-all duration-300 shadow-md hover:shadow-lg"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <ChevronLeft className="w-6 h-6 text-foreground" />
-            </motion.button>
-
-            <div className="flex space-x-3">
-              {testimonials.map((_, index) => (
-                <motion.button
-                  key={index}
-                  onClick={() => goToTestimonial(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    index === currentIndex
-                      ? 'bg-primary scale-125'
-                      : 'bg-muted hover:bg-muted-foreground/50'
-                  }`}
-                  whileHover={{ scale: 1.2 }}
-                  whileTap={{ scale: 0.9 }}
-                />
-              ))}
-            </div>
-
-            <motion.button
-              onClick={nextTestimonial}
-              className="p-3 rounded-full bg-card border border-border hover:bg-accent hover:border-primary transition-all duration-300 shadow-md hover:shadow-lg"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <ChevronRight className="w-6 h-6 text-foreground" />
-            </motion.button>
-          </div>
-
-          <motion.div
-            className="text-center mt-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
+          {/* Navigation Buttons */}
+          <button
+            onClick={prevTestimonial}
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white dark:bg-card shadow-lg rounded-full p-3 text-emerald-600 hover:text-white hover:bg-emerald-600 transition-all duration-300 border border-emerald-100 dark:border-emerald-900/20 group"
+            aria-label="Previous testimonial"
           >
-            <p className="text-muted-foreground">
-              {isAutoPlaying ? 'Auto-playing testimonials' : 'Hover over cards to pause auto-play'} • 
-              <span className="ml-2 font-medium">
-                {currentIndex + 1} of {testimonials.length}
-              </span>
-            </p>
-          </motion.div>
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
+          <button
+            onClick={nextTestimonial}
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white dark:bg-card shadow-lg rounded-full p-3 text-emerald-600 hover:text-white hover:bg-emerald-600 transition-all duration-300 border border-emerald-100 dark:border-emerald-900/20 group"
+            aria-label="Next testimonial"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
         </div>
+
+        {/* Dots Navigation */}
+        <div className="flex justify-center gap-3 mt-8">
+          {testimonials.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToTestimonial(index)}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                index === currentIndex
+                  ? "bg-emerald-500 scale-125"
+                  : "bg-emerald-200 hover:bg-emerald-300"
+              }`}
+              aria-label={`Go to testimonial ${index + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Auto-play Indicator */}
+        <div className="text-center mt-6">
+          <p className="text-sm text-muted-foreground">
+            {isAutoPlaying ? "Auto-playing testimonials" : "Hover to pause auto-play"}
+          </p>
+        </div>
+
+        {/* Stats */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16"
+        >
+          <div className="text-center">
+            <div className="text-3xl md:text-4xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">
+              50+
+            </div>
+            <p className="text-muted-foreground">Happy Clients</p>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl md:text-4xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">
+              98%
+            </div>
+            <p className="text-muted-foreground">Satisfaction Rate</p>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl md:text-4xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">
+              100+
+            </div>
+            <p className="text-muted-foreground">Projects Completed</p>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

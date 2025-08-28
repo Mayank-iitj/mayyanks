@@ -1,76 +1,73 @@
 "use client";
 
-import React, { useRef } from 'react';
-import { motion, useInView } from 'framer-motion';
-import { Award, Trophy, Star, Medal, Crown, Zap } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Award, Trophy, Certificate, Star, Shield, Medal } from 'lucide-react';
 
-interface Award {
+interface AwardData {
   id: string;
   title: string;
+  organization: string;
   year: string;
   description: string;
-  icon: React.ElementType;
-  gradient: string;
-  glowColor: string;
-  badge?: string;
+  icon: React.ComponentType<any>;
+  category: string;
 }
 
-const awards: Award[] = [
+const awards: AwardData[] = [
   {
     id: '1',
-    title: 'AI Excellence Award',
+    title: 'Google Cloud Professional Developer',
+    organization: 'Google Cloud',
     year: '2024',
-    description: 'Recognition for outstanding innovation in artificial intelligence and machine learning solutions',
-    icon: Crown,
-    gradient: 'from-yellow-400 via-orange-500 to-red-500',
-    glowColor: 'shadow-yellow-500/25',
-    badge: 'LATEST'
+    description: 'Certified professional developer with expertise in cloud-native application development and deployment.',
+    icon: Shield,
+    category: 'Cloud Certification'
   },
   {
     id: '2',
-    title: 'Best Innovation in ML',
+    title: 'AWS Solutions Architect Associate',
+    organization: 'Amazon Web Services',
     year: '2023',
-    description: 'Awarded for breakthrough developments in machine learning algorithms and applications',
-    icon: Zap,
-    gradient: 'from-blue-400 via-purple-500 to-indigo-600',
-    glowColor: 'shadow-blue-500/25'
+    description: 'Demonstrated expertise in designing distributed systems and applications on AWS cloud platform.',
+    icon: Award,
+    category: 'Cloud Architecture'
   },
   {
     id: '3',
-    title: 'Top 10 AI Startups',
+    title: 'Top Performer Award',
+    organization: 'Tech Innovation Corp',
     year: '2023',
-    description: 'Selected as one of the most promising AI startups driving industry transformation',
+    description: 'Recognized for exceptional performance in developing scalable web applications and leading technical initiatives.',
     icon: Trophy,
-    gradient: 'from-emerald-400 via-teal-500 to-cyan-600',
-    glowColor: 'shadow-emerald-500/25'
+    category: 'Performance Excellence'
   },
   {
     id: '4',
-    title: 'Industry Recognition Award',
-    year: '2022',
-    description: 'Recognized by industry leaders for exceptional contribution to AI advancement',
-    icon: Medal,
-    gradient: 'from-purple-400 via-pink-500 to-rose-500',
-    glowColor: 'shadow-purple-500/25'
+    title: 'Certified Kubernetes Administrator',
+    organization: 'Cloud Native Computing Foundation',
+    year: '2023',
+    description: 'Validated skills in Kubernetes cluster administration, networking, and application deployment.',
+    icon: Certificate,
+    category: 'DevOps Certification'
   },
   {
     id: '5',
-    title: 'Client Choice Award',
-    year: '2024',
-    description: 'Voted by clients as the preferred partner for AI and machine learning solutions',
+    title: 'Outstanding Innovation Award',
+    organization: 'Digital Solutions Ltd',
+    year: '2022',
+    description: 'Honored for innovative contributions to microservices architecture and API development.',
     icon: Star,
-    gradient: 'from-amber-400 via-yellow-500 to-orange-500',
-    glowColor: 'shadow-amber-500/25',
-    badge: 'POPULAR'
+    category: 'Innovation'
   },
   {
     id: '6',
-    title: 'Technical Excellence Certification',
-    year: '2023',
-    description: 'Certified for maintaining highest standards in technical implementation and delivery',
-    icon: Award,
-    gradient: 'from-indigo-400 via-blue-500 to-cyan-500',
-    glowColor: 'shadow-indigo-500/25'
+    title: 'React Developer Certification',
+    organization: 'Meta',
+    year: '2022',
+    description: 'Certified in advanced React development, state management, and modern frontend architecture.',
+    icon: Medal,
+    category: 'Frontend Development'
   }
 ];
 
@@ -79,8 +76,8 @@ const containerVariants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2,
-      delayChildren: 0.1
+      staggerChildren: 0.1,
+      delayChildren: 0.2
     }
   }
 };
@@ -91,8 +88,8 @@ const cardVariants = {
     y: 50,
     scale: 0.9
   },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     scale: 1,
     transition: {
@@ -105,183 +102,111 @@ const cardVariants = {
 };
 
 const iconVariants = {
-  rest: { 
-    scale: 1, 
-    rotate: 0,
-    y: 0
-  },
-  hover: { 
-    scale: 1.1, 
+  hover: {
+    scale: 1.1,
     rotate: 5,
-    y: -5,
     transition: {
       type: "spring",
-      stiffness: 400,
+      stiffness: 300,
       damping: 10
     }
-  },
-  tap: { 
-    scale: 0.95,
-    rotate: -5
   }
 };
 
-const floatingVariants = {
-  animate: {
-    y: [-10, 10, -10],
-    rotate: [0, 5, -5, 0],
-    transition: {
-      duration: 6,
-      repeat: Infinity,
-      ease: "easeInOut"
-    }
-  }
-};
-
-const glowVariants = {
-  rest: {
-    boxShadow: "0 0 0 rgba(0,0,0,0)"
-  },
-  hover: {
-    boxShadow: [
-      "0 0 20px rgba(59, 130, 246, 0.3)",
-      "0 0 40px rgba(59, 130, 246, 0.4)",
-      "0 0 20px rgba(59, 130, 246, 0.3)"
-    ],
-    transition: {
-      duration: 2,
-      repeat: Infinity,
-      ease: "easeInOut"
-    }
-  }
-};
-
-export const AwardsSection: React.FC = () => {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-
+export const AwardsSection = () => {
   return (
-    <section className="py-24 bg-gradient-to-br from-background via-muted/30 to-background overflow-hidden">
-      <div className="container mx-auto px-4 max-w-7xl">
+    <section className="py-20 px-4 bg-gradient-to-br from-emerald-50/30 via-white to-emerald-50/20 dark:from-emerald-950/10 dark:via-background dark:to-emerald-950/5">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
           <motion.div
-            animate={floatingVariants.animate}
-            className="inline-block mb-4"
+            initial={{ scale: 0 }}
+            whileInView={{ scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+            className="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 dark:bg-emerald-900/20 rounded-full mb-6"
           >
-            <Trophy className="w-16 h-16 text-primary mx-auto" />
+            <Trophy className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
           </motion.div>
-          
-          <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-foreground via-primary to-foreground bg-clip-text text-transparent mb-4">
-            Awards & Recognition
+          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+            Awards & 
+            <span className="text-emerald-600 dark:text-emerald-400"> Certifications</span>
           </h2>
-          
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Celebrating our achievements and commitment to excellence in artificial intelligence and innovation
+          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            Recognition of excellence and continuous learning in software engineering, 
+            cloud technologies, and innovative development practices.
           </p>
         </motion.div>
 
         {/* Awards Grid */}
         <motion.div
-          ref={ref}
           variants={containerVariants}
           initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
-          {awards.map((award, index) => {
+          {awards.map((award) => {
             const IconComponent = award.icon;
             
             return (
               <motion.div
                 key={award.id}
                 variants={cardVariants}
-                whileHover="hover"
-                whileTap="tap"
-                initial="rest"
+                whileHover={{ 
+                  y: -8,
+                  transition: { type: "spring", stiffness: 300, damping: 20 }
+                }}
                 className="group relative"
               >
-                {/* Background glow effect */}
-                <motion.div
-                  variants={glowVariants}
-                  className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                />
-                
-                {/* Card */}
-                <div className={`relative bg-card/80 backdrop-blur-sm border border-border/50 rounded-xl p-8 h-full transition-all duration-500 group-hover:border-primary/30 ${award.glowColor} group-hover:shadow-2xl`}>
+                <div className="relative bg-white dark:bg-card rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 dark:border-gray-800 overflow-hidden">
+                  {/* Background Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 via-transparent to-emerald-600/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   
-                  {/* Badge */}
-                  {award.badge && (
-                    <motion.div
-                      initial={{ scale: 0, rotate: -10 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ delay: index * 0.1 + 0.5, type: "spring", stiffness: 200 }}
-                      className="absolute -top-2 -right-2 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-xs font-bold px-3 py-1 rounded-full shadow-lg"
-                    >
-                      {award.badge}
-                    </motion.div>
-                  )}
-
-                  {/* Icon with gradient background */}
-                  <div className="relative mb-6">
-                    <motion.div
-                      variants={iconVariants}
-                      className={`w-16 h-16 mx-auto rounded-xl bg-gradient-to-br ${award.gradient} p-4 shadow-lg group-hover:shadow-xl transition-shadow duration-500`}
-                    >
-                      <IconComponent className="w-full h-full text-white" />
-                    </motion.div>
-                    
-                    {/* Floating particles */}
-                    <motion.div
-                      animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.5, 1, 0.5],
-                      }}
-                      transition={{
-                        duration: 3,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                        delay: index * 0.5
-                      }}
-                      className="absolute inset-0 w-16 h-16 mx-auto rounded-xl bg-gradient-to-br from-primary/20 to-accent/20 blur-sm"
-                    />
+                  {/* Category Badge */}
+                  <div className="absolute top-4 right-4">
+                    <span className="px-2 py-1 text-xs font-medium bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full">
+                      {award.category}
+                    </span>
                   </div>
 
+                  {/* Icon */}
+                  <motion.div
+                    variants={iconVariants}
+                    whileHover="hover"
+                    className="relative z-10 w-14 h-14 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center mb-4 shadow-lg"
+                  >
+                    <IconComponent className="w-7 h-7 text-white" />
+                  </motion.div>
+
                   {/* Content */}
-                  <div className="text-center space-y-4">
-                    <motion.h3 
-                      className="text-xl font-bold text-card-foreground group-hover:text-primary transition-colors duration-300"
-                      whileHover={{ scale: 1.05 }}
-                    >
+                  <div className="relative z-10">
+                    <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300">
                       {award.title}
-                    </motion.h3>
+                    </h3>
                     
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: index * 0.1 + 0.3, type: "spring", stiffness: 200 }}
-                      className="inline-block bg-gradient-to-r from-primary/10 to-accent/10 text-primary font-semibold px-4 py-2 rounded-full text-sm border border-primary/20"
-                    >
-                      {award.year}
-                    </motion.div>
+                    <div className="flex items-center justify-between mb-3">
+                      <p className="text-emerald-600 dark:text-emerald-400 font-semibold text-sm">
+                        {award.organization}
+                      </p>
+                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-full">
+                        {award.year}
+                      </span>
+                    </div>
                     
-                    <p className="text-muted-foreground leading-relaxed text-sm">
+                    <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
                       {award.description}
                     </p>
                   </div>
 
-                  {/* Bottom accent */}
-                  <motion.div
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{ delay: index * 0.1 + 0.8, duration: 0.8, ease: "easeOut" }}
-                    className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${award.gradient} rounded-b-xl opacity-60 group-hover:opacity-100 transition-opacity duration-500`}
-                  />
+                  {/* Hover Effect Border */}
+                  <div className="absolute inset-0 rounded-2xl border-2 border-emerald-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
               </motion.div>
             );
@@ -290,38 +215,40 @@ export const AwardsSection: React.FC = () => {
 
         {/* Stats Section */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.8, duration: 0.8 }}
-          className="mt-20 text-center"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.4, duration: 0.6 }}
+          className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8"
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {[
-              { number: "6+", label: "Major Awards", delay: 1 },
-              { number: "4", label: "Years of Excellence", delay: 1.2 },
-              { number: "100%", label: "Industry Recognition", delay: 1.4 }
-            ].map((stat, index) => (
+          {[
+            { label: "Certifications", value: "6+", icon: Certificate },
+            { label: "Awards Won", value: "3", icon: Trophy },
+            { label: "Years Experience", value: "5+", icon: Star },
+            { label: "Technologies Mastered", value: "15+", icon: Shield }
+          ].map((stat, index) => {
+            const StatIcon = stat.icon;
+            return (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, scale: 0.5 }}
-                animate={isInView ? { opacity: 1, scale: 1 } : {}}
-                transition={{ delay: stat.delay, type: "spring", stiffness: 100 }}
-                className="bg-card/50 backdrop-blur-sm border border-border/30 rounded-xl p-6 hover:border-primary/30 transition-colors duration-300"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 * index, duration: 0.5 }}
+                className="text-center group"
               >
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={isInView ? { opacity: 1 } : {}}
-                  transition={{ delay: stat.delay + 0.3, duration: 1 }}
-                  className="text-3xl font-bold text-primary mb-2"
-                >
-                  {stat.number}
-                </motion.div>
-                <div className="text-muted-foreground font-medium">
+                <div className="inline-flex items-center justify-center w-12 h-12 bg-emerald-100 dark:bg-emerald-900/20 rounded-full mb-3 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-900/30 transition-colors duration-300">
+                  <StatIcon className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <div className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                   {stat.label}
                 </div>
               </motion.div>
-            ))}
-          </div>
+            );
+          })}
         </motion.div>
       </div>
     </section>

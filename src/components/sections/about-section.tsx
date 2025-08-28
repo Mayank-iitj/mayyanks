@@ -1,228 +1,247 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useInView } from "framer-motion";
-import { useRef } from "react";
-import { Brain, Lightbulb, Zap, Target, Users, Award } from "lucide-react";
+import { Code2, Briefcase, GraduationCap, Award, Users, Lightbulb } from "lucide-react";
+
+const aboutData = {
+  intro: {
+    title: "About Mayank Sharma",
+    description: "Passionate Full Stack Developer with expertise in modern web technologies and a keen eye for creating exceptional digital experiences.",
+    stats: [
+      { label: "Years Experience", value: "5+" },
+      { label: "Projects Completed", value: "50+" },
+      { label: "Technologies Mastered", value: "20+" },
+      { label: "Happy Clients", value: "30+" }
+    ]
+  },
+  cards: [
+    {
+      icon: Code2,
+      title: "Technical Expertise",
+      description: "Proficient in React, Next.js, Node.js, TypeScript, and modern web development frameworks. Experienced in building scalable applications with clean, maintainable code.",
+      skills: ["React & Next.js", "TypeScript", "Node.js", "Database Design", "Cloud Deployment"]
+    },
+    {
+      icon: Briefcase,
+      title: "Professional Experience",
+      description: "5+ years of experience delivering high-quality web solutions for startups and enterprises. Specialized in full-stack development and system architecture.",
+      skills: ["Full-Stack Development", "System Architecture", "API Design", "Performance Optimization", "DevOps"]
+    },
+    {
+      icon: Users,
+      title: "Leadership & Collaboration",
+      description: "Strong team player with experience leading development teams and mentoring junior developers. Excellent communication and project management skills.",
+      skills: ["Team Leadership", "Mentoring", "Agile Methodology", "Client Communication", "Code Reviews"]
+    },
+    {
+      icon: Lightbulb,
+      title: "Innovation & Problem Solving",
+      description: "Creative problem-solver who loves tackling complex challenges and implementing innovative solutions. Always staying updated with the latest industry trends.",
+      skills: ["Creative Solutions", "Research & Development", "Technical Strategy", "Performance Analysis", "Continuous Learning"]
+    }
+  ]
+};
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut"
+    }
+  }
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 50, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.7,
+      ease: "easeOut"
+    }
+  },
+  hover: {
+    y: -8,
+    scale: 1.02,
+    transition: {
+      duration: 0.3,
+      ease: "easeOut"
+    }
+  }
+};
+
+const statsVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut"
+    }
+  }
+};
 
 export const AboutSection = () => {
-  const sectionRef = useRef(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        duration: 0.6
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
-    }
-  };
-
-  const cardHoverVariants = {
-    hover: {
-      y: -5,
-      scale: 1.02,
-      transition: { duration: 0.3, ease: "easeOut" }
-    }
-  };
-
-  const iconHoverVariants = {
-    hover: {
-      scale: 1.1,
-      rotate: 5,
-      transition: { duration: 0.3, ease: "easeOut" }
-    }
-  };
-
   return (
-    <section ref={sectionRef} className="py-24 px-6 bg-background">
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-emerald-50/50 via-white to-teal-50/30 dark:from-emerald-950/20 dark:via-background dark:to-teal-950/10">
       <div className="max-w-7xl mx-auto">
         <motion.div
           variants={containerVariants}
           initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
           className="space-y-16"
         >
-          {/* Header */}
-          <motion.div variants={itemVariants} className="text-center space-y-4">
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground">
-              About DesignCube
-            </h2>
-            <div className="w-24 h-1 bg-primary mx-auto rounded-full" />
+          {/* Header Section */}
+          <motion.div variants={itemVariants} className="text-center space-y-6">
+            <motion.h2 
+              className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 bg-clip-text text-transparent"
+              whileHover={{ scale: 1.02 }}
+              transition={{ duration: 0.2 }}
+            >
+              {aboutData.intro.title}
+            </motion.h2>
+            <motion.p 
+              className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"
+              variants={itemVariants}
+            >
+              {aboutData.intro.description}
+            </motion.p>
           </motion.div>
 
-          {/* Main Description */}
-          <motion.div variants={itemVariants} className="max-w-4xl mx-auto">
-            <div className="bg-card border border-border rounded-xl p-8 md:p-12 shadow-lg hover:shadow-xl transition-shadow duration-300">
-              <p className="text-lg md:text-xl text-muted-foreground leading-relaxed text-center">
-                DesignCube is at the forefront of artificial intelligence and machine learning innovation, 
-                crafting intelligent solutions that transform how businesses operate and grow. We specialize 
-                in developing cutting-edge AI systems, predictive analytics platforms, and automated 
-                workflows that drive efficiency and unlock new possibilities.
-              </p>
-            </div>
-          </motion.div>
-
-          {/* Feature Grid */}
+          {/* Stats Section */}
           <motion.div 
             variants={itemVariants}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
           >
-            {/* AI Expertise Card */}
-            <motion.div
-              variants={cardHoverVariants}
-              whileHover="hover"
-              className="bg-card border border-border rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300 group"
-            >
+            {aboutData.intro.stats.map((stat, index) => (
               <motion.div
-                variants={iconHoverVariants}
-                whileHover="hover"
-                className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4"
+                key={stat.label}
+                variants={statsVariants}
+                whileHover={{ scale: 1.05 }}
+                className="text-center p-6 rounded-2xl bg-white/60 dark:bg-card/40 backdrop-blur-sm border border-emerald-100 dark:border-emerald-900/30 shadow-lg"
               >
-                <Brain className="w-6 h-6 text-primary" />
+                <motion.div
+                  initial={{ scale: 0 }}
+                  whileInView={{ scale: 1 }}
+                  transition={{ delay: index * 0.1, duration: 0.5, type: "spring" }}
+                  className="text-3xl md:text-4xl font-bold text-emerald-600 dark:text-emerald-400 mb-2"
+                >
+                  {stat.value}
+                </motion.div>
+                <div className="text-sm md:text-base text-muted-foreground font-medium">
+                  {stat.label}
+                </div>
               </motion.div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">
-                AI & Machine Learning
-              </h3>
-              <p className="text-muted-foreground">
-                Deep expertise in neural networks, deep learning, and advanced algorithms 
-                that power intelligent decision-making systems.
-              </p>
-            </motion.div>
+            ))}
+          </motion.div>
 
-            {/* Innovation Card */}
-            <motion.div
-              variants={cardHoverVariants}
-              whileHover="hover"
-              className="bg-card border border-border rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300 group"
-            >
-              <motion.div
-                variants={iconHoverVariants}
-                whileHover="hover"
-                className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4"
-              >
-                <Lightbulb className="w-6 h-6 text-primary" />
-              </motion.div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">
-                Innovative Solutions
-              </h3>
-              <p className="text-muted-foreground">
-                Creative problem-solving approaches that combine cutting-edge technology 
-                with practical business applications.
-              </p>
-            </motion.div>
+          {/* Cards Grid */}
+          <motion.div 
+            variants={containerVariants}
+            className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto"
+          >
+            {aboutData.cards.map((card, index) => {
+              const IconComponent = card.icon;
+              return (
+                <motion.div
+                  key={card.title}
+                  variants={cardVariants}
+                  whileHover="hover"
+                  className="group relative"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-emerald-600/10 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  
+                  <div className="relative p-8 rounded-3xl bg-white/80 dark:bg-card/60 backdrop-blur-sm border border-emerald-100/50 dark:border-emerald-900/30 shadow-xl hover:shadow-2xl transition-all duration-500">
+                    {/* Icon */}
+                    <motion.div
+                      whileHover={{ rotate: 5, scale: 1.1 }}
+                      transition={{ duration: 0.3 }}
+                      className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white mb-6 shadow-lg"
+                    >
+                      <IconComponent className="w-7 h-7" />
+                    </motion.div>
 
-            {/* Performance Card */}
-            <motion.div
-              variants={cardHoverVariants}
-              whileHover="hover"
-              className="bg-card border border-border rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300 group"
-            >
-              <motion.div
-                variants={iconHoverVariants}
-                whileHover="hover"
-                className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4"
-              >
-                <Zap className="w-6 h-6 text-primary" />
-              </motion.div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">
-                High Performance
-              </h3>
-              <p className="text-muted-foreground">
-                Optimized systems that deliver exceptional speed, reliability, 
-                and scalability for enterprise-grade applications.
-              </p>
-            </motion.div>
+                    {/* Content */}
+                    <motion.h3 
+                      className="text-xl md:text-2xl font-bold text-foreground mb-4 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300"
+                      whileHover={{ x: 2 }}
+                    >
+                      {card.title}
+                    </motion.h3>
+                    
+                    <motion.p 
+                      className="text-muted-foreground leading-relaxed mb-6"
+                      variants={itemVariants}
+                    >
+                      {card.description}
+                    </motion.p>
 
-            {/* Strategic Focus Card */}
-            <motion.div
-              variants={cardHoverVariants}
-              whileHover="hover"
-              className="bg-card border border-border rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300 group"
-            >
-              <motion.div
-                variants={iconHoverVariants}
-                whileHover="hover"
-                className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4"
-              >
-                <Target className="w-6 h-6 text-primary" />
-              </motion.div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">
-                Strategic Vision
-              </h3>
-              <p className="text-muted-foreground">
-                Data-driven insights and strategic planning that align technology 
-                solutions with long-term business objectives.
-              </p>
-            </motion.div>
+                    {/* Skills Tags */}
+                    <motion.div 
+                      className="flex flex-wrap gap-2"
+                      variants={containerVariants}
+                    >
+                      {card.skills.map((skill, skillIndex) => (
+                        <motion.span
+                          key={skill}
+                          variants={itemVariants}
+                          whileHover={{ scale: 1.05 }}
+                          className="px-3 py-1.5 text-xs md:text-sm font-medium bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 rounded-full border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors duration-200"
+                        >
+                          {skill}
+                        </motion.span>
+                      ))}
+                    </motion.div>
 
-            {/* Client-Focused Card */}
-            <motion.div
-              variants={cardHoverVariants}
-              whileHover="hover"
-              className="bg-card border border-border rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300 group"
-            >
-              <motion.div
-                variants={iconHoverVariants}
-                whileHover="hover"
-                className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4"
-              >
-                <Users className="w-6 h-6 text-primary" />
-              </motion.div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">
-                Client-Centered
-              </h3>
-              <p className="text-muted-foreground">
-                Collaborative partnerships focused on understanding unique challenges 
-                and delivering tailored AI solutions.
-              </p>
-            </motion.div>
-
-            {/* Excellence Card */}
-            <motion.div
-              variants={cardHoverVariants}
-              whileHover="hover"
-              className="bg-card border border-border rounded-xl p-6 shadow-md hover:shadow-lg transition-shadow duration-300 group"
-            >
-              <motion.div
-                variants={iconHoverVariants}
-                whileHover="hover"
-                className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4"
-              >
-                <Award className="w-6 h-6 text-primary" />
-              </motion.div>
-              <h3 className="text-xl font-semibold text-foreground mb-3">
-                Proven Excellence
-              </h3>
-              <p className="text-muted-foreground">
-                Track record of successful implementations and measurable results 
-                across diverse industries and use cases.
-              </p>
-            </motion.div>
+                    {/* Hover Effect Border */}
+                    <motion.div
+                      className="absolute inset-0 rounded-3xl border-2 border-emerald-500/0 group-hover:border-emerald-500/20 transition-all duration-500"
+                      whileHover={{ 
+                        boxShadow: "0 0 0 1px rgba(16, 185, 129, 0.1), 0 25px 50px -12px rgba(16, 185, 129, 0.25)" 
+                      }}
+                    />
+                  </div>
+                </motion.div>
+              );
+            })}
           </motion.div>
 
           {/* Bottom CTA */}
-          <motion.div variants={itemVariants} className="text-center">
-            <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl p-8 md:p-12 border border-primary/20">
-              <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
-                Ready to Transform Your Business?
-              </h3>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Let's explore how AI and machine learning can revolutionize your operations, 
-                enhance decision-making, and unlock new growth opportunities.
-              </p>
-            </div>
+          <motion.div 
+            variants={itemVariants}
+            className="text-center pt-8"
+          >
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 cursor-pointer group"
+            >
+              <span>Let's Work Together</span>
+              <motion.div
+                animate={{ x: [0, 4, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className="group-hover:translate-x-1 transition-transform duration-200"
+              >
+                →
+              </motion.div>
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>
